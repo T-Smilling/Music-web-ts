@@ -24,16 +24,18 @@ if(elementAplayer){
   });
 
   const avatar=document.querySelector(".singer-detail .inner-avatar");
-  // ap.on('ended', function () {
-  //   const link = `/songs/listen/${dataSong._id}`;
-  //   fetch(link, {
-  //     method: "PATCH"
-  //   })
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       console.log(data);
-  //     })
-  // });
+
+  ap.on('ended', function () {
+    const link = `/songs/listen/${dataSong._id}`;
+    fetch(link, {
+      method: "PATCH"
+    })
+      .then(res => res.json())
+      .then(data => {
+        const spanListen=buttonLike.querySelector("[data-listen]");
+        spanListen.innerHTML=data.listen;
+      })
+  });
   ap.on('play', function () {
     avatar.style.animationPlayState = "running";
   });
@@ -151,25 +153,61 @@ if(formLogin){
 //End Account Login
 
 // buttonFavorite
-const listButtonFavorite = document.querySelectorAll("[button-favorite]");
-if(listButtonFavorite.length > 0) {
-  listButtonFavorite.forEach(buttonFavorite => {
-    buttonFavorite.addEventListener("click", () => {
-      const isActive = buttonFavorite.classList.contains("active");
-  
-      const typeFavorite = isActive ? "no" : "yes";
-  
-      const idSong = buttonFavorite.getAttribute("button-favorite");
-      const link = `/songs/favorite/${typeFavorite}/${idSong}`;
-      fetch(link, {
-        method: "PATCH"
+const ButtonFavorite = document.querySelector("[button-favorite]");
+if(ButtonFavorite) {
+  ButtonFavorite.addEventListener("click", () => {
+    const isActive = ButtonFavorite.classList.contains("active");
+
+    const typeFavorite = isActive ? "no" : "yes";
+
+    const idSong = ButtonFavorite.getAttribute("button-favorite");
+    const link = `/songs/favorite/${typeFavorite}/${idSong}`;
+    fetch(link, {
+      method: "PATCH"
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        ButtonFavorite.classList.toggle("active");
       })
-        .then(res => res.json())
-        .then(data => {
-          console.log(data);
-          buttonFavorite.classList.toggle("active");
-        })
-    });
-  })
+  });
 }
 //End buttonFavorite
+
+//Box Search
+const boxSearch=document.querySelector(".box-search");
+if(boxSearch){
+  const input=boxSearch.querySelector("input[name='keyword']");
+  const boxSuggest=boxSearch.querySelector(".inner-suggest");
+  input.addEventListener("keyup",()=>{
+    const keyword=input.value;
+    const link=`/search/suggest?keyword=${keyword}`;
+    fetch(link)
+      .then(res=>res.json())
+      .then(data=>{
+        const songs=data.songs;
+        if(songs.length>0){
+          boxSuggest.classList.add("show");
+          const htmls=songs.map(song=>{
+            return `
+              <a class="inner-item" href="/songs/detail/${song.slug}">
+                <div class="inner-image">
+                    <img src="${song.avatar}"/>
+                </div>
+                <div class="inner-info">
+                    <div class="inner-title">${song.title}</div>
+                    <div class="inner-singer"><i class="fa-solid fa-microphone-lines"></i> ${song.infoSinger.fullName}</div>
+                </div>
+              </a>
+            `;
+          });
+          const boxList = boxSuggest.querySelector(".inner-list");
+          boxList.innerHTML=htmls.join("");
+        }
+        else{
+          boxSuggest.classList.remove("show");
+        }
+      })
+  })
+}
+//End Box seacrch

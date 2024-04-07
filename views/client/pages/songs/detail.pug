@@ -20,6 +20,9 @@ block main
               span <span data-like>#{song.like.length}</span> thích
             div(class=`inner-action inner-heart ${song.isFavoriteSong ? "active" : ""}` button-favorite=song.id)
               <i class="fa-regular fa-heart"></i> Bài hát yêu thích
+            div(class="inner-action inner-listen")
+              <i class="fa-solid fa-headphones"></i>
+              span <span data-listen>#{song.listen}</span> lượt nghe
 
           .inner-play
             .inner-avatar

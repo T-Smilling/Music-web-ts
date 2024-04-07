@@ -5,6 +5,7 @@ import { SearchRoute } from "./search.route";
 import { RouteUser } from "./user.route";
 
 import * as userMiddleware from "../../middlewares/user.middleware";
+import { FavoriteRoute } from "./favorite-songs.route";
 
 const ClientRoute = (app:Express) :void => {
   app.use(userMiddleware.infoUser);
@@ -13,6 +14,7 @@ const ClientRoute = (app:Express) :void => {
   app.use("/songs",SongRoute);
   app.use("/search",SearchRoute);
   app.use("/user",RouteUser);
+  app.use("/favorite-songs",FavoriteRoute);
 };
 
 export default ClientRoute;
