@@ -3,6 +3,8 @@ import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
+const cookieParser = require('cookie-parser');
+
 import methodOverride from "method-override";
 
 import * as database from "./config/database";
@@ -19,10 +21,11 @@ app.set('view engine', 'pug')
 
 
 app.use(express.static(`${__dirname}/public`));
+app.use(cookieParser("T~Smilling"));
 // app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
 // app.use(methodOverride('_method'));
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
 
 

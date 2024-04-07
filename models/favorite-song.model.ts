@@ -4,6 +4,7 @@ const favoriteSongSchema = new mongoose.Schema(
   {
     userId: String,
     songId: String,
+    love:Array,
     deleted: {
       type: Boolean,
       default: false,
