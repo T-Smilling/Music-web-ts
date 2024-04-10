@@ -3,13 +3,15 @@ import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
-const cookieParser = require('cookie-parser');
+import cookieParser from 'cookie-parser';
+import multer from "multer"
 
 import methodOverride from "method-override";
 
 import * as database from "./config/database";
 import {systemConfig} from "./config/system";
 import ClientRoute from "./routes/client/index.route";
+import AdminRoute from "./routes/admin/index.route";
 
 database.connect();
 
@@ -22,10 +24,11 @@ app.set('view engine', 'pug')
 
 app.use(express.static(`${__dirname}/public`));
 app.use(cookieParser("T~Smilling"));
-// app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
-// app.use(methodOverride('_method'));
+app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
+app.use(methodOverride('_method'));
 
-app.use(bodyParser.json());
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
 
 
@@ -37,6 +40,7 @@ app.locals.prefixAdmin = systemConfig.prefixAdmin;
 
 //Route
 ClientRoute(app);
+AdminRoute(app);
 //End Route
 
 app.listen(port, () => {
