@@ -97,3 +97,52 @@ export const permissionsPatch = async (req: Request, res: Response) => {
     });
   }
 }
+// [GET] /admin/roles/edit/:id
+export const edit = async (req: Request, res: Response) => {
+  try {
+    const idRole:string=req.params.id;
+    let find= {
+      _id:idRole,
+      deleted: false
+    };
+    const records= await Role.findOne(find);
+    res.render("admin/pages/roles/edit" ,{
+      pageTitle:"Chỉnh sửa phân quyền",
+      record:records
+    })
+  } catch (error) {
+    res.render("client/pages/errors/404",{
+      pageTitle:"404 Not Fount",
+    });
+  }
+};
+
+// [PATCH] /admin/roles/edit/:id
+export const editPatch = async (req: Request, res: Response) => {
+  try {
+    const idRole:string=req.params.id;
+    await Role.updateOne({
+      _id:idRole
+    },req.body);
+    res.redirect("back");
+  } catch (error) {
+    res.render("client/pages/errors/404",{
+      pageTitle:"404 Not Fount",
+    });
+  }
+};
+
+// [GET] /admin/roles/edit/:id
+export const deleteRole = async (req: Request, res: Response) => {
+  try {
+    const idRole:string=req.params.id;
+    await Role.updateOne({
+      _id:idRole
+    },{deleted:true});
+    res.redirect("back");
+  } catch (error) {
+    res.render("client/pages/errors/404",{
+      pageTitle:"404 Not Fount",
+    });
+  }
+};

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.permissionsPatch = exports.permissions = exports.detail = exports.createPost = exports.create = exports.index = void 0;
+exports.deleteRole = exports.editPatch = exports.edit = exports.permissionsPatch = exports.permissions = exports.detail = exports.createPost = exports.create = exports.index = void 0;
 const role_model_1 = __importDefault(require("../../models/role.model"));
 const system_1 = require("../../config/system");
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -112,3 +112,53 @@ const permissionsPatch = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.permissionsPatch = permissionsPatch;
+const edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idRole = req.params.id;
+        let find = {
+            _id: idRole,
+            deleted: false
+        };
+        const records = yield role_model_1.default.findOne(find);
+        res.render("admin/pages/roles/edit", {
+            pageTitle: "Chỉnh sửa phân quyền",
+            record: records
+        });
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.edit = edit;
+const editPatch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idRole = req.params.id;
+        yield role_model_1.default.updateOne({
+            _id: idRole
+        }, req.body);
+        res.redirect("back");
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.editPatch = editPatch;
+const deleteRole = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idRole = req.params.id;
+        yield role_model_1.default.updateOne({
+            _id: idRole
+        }, { deleted: true });
+        res.redirect("back");
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.deleteRole = deleteRole;

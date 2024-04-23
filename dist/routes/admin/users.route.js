@@ -28,4 +28,8 @@ const express_1 = require("express");
 const router = (0, express_1.Router)();
 const controller = __importStar(require("../../controllers/admin/users.controller"));
 router.get("/", controller.index);
+router.get("/detail/:idUser", controller.detail);
+router.get("/edit/:idUser", controller.edit);
+router.post("/edit/:idUser", controller.editPost);
+router.get("/delete/:idUser", controller.deleteUser);
 exports.UserAdminRouter = router;

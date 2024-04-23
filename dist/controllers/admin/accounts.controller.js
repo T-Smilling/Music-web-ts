@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPost = exports.create = exports.index = void 0;
+exports.deleteAccount = exports.editPost = exports.edit = exports.detail = exports.createPost = exports.create = exports.index = void 0;
 const md5_1 = __importDefault(require("md5"));
 const system_1 = require("../../config/system");
 const accounts_model_1 = __importDefault(require("../../models/accounts.model"));
@@ -91,3 +91,106 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createPost = createPost;
+const detail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idAccount = req.params.idAccount;
+        let find = {
+            deleted: false,
+            _id: idAccount
+        };
+        const newRecord = [];
+        const record = yield accounts_model_1.default.findOne(find).select("-password -token");
+        const role = yield role_model_1.default.findOne({
+            _id: record.role_id,
+            deleted: false
+        });
+        newRecord.push({
+            id: record.id,
+            fullName: record.fullName,
+            email: record.email,
+            phone: record.phone,
+            role: role.title,
+            status: record.status,
+        });
+        res.render("admin/pages/accounts/detail", {
+            pageTitle: "Tài khoản Admin",
+            record: newRecord[0]
+        });
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.detail = detail;
+const edit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idAccount = req.params.idAccount;
+        let find = {
+            deleted: false,
+            _id: idAccount
+        };
+        const newRecord = [];
+        const record = yield accounts_model_1.default.findOne(find).select("-password -token");
+        const role = yield role_model_1.default.findOne({
+            _id: record.role_id,
+            deleted: false
+        });
+        const recordRole = yield role_model_1.default.find({
+            deleted: false
+        });
+        newRecord.push({
+            id: record.id,
+            fullName: record.fullName,
+            email: record.email,
+            phone: record.phone,
+            role: role.title,
+            status: record.status,
+        });
+        res.render("admin/pages/accounts/edit", {
+            pageTitle: "Chỉnh sửa tài khoản",
+            record: newRecord[0],
+            recordRole: recordRole
+        });
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.edit = edit;
+const editPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idAccount = req.params.idAccount;
+        if (req.body.password) {
+            req.body.password = (0, md5_1.default)(req.body.password);
+        }
+        yield accounts_model_1.default.updateOne({
+            _id: idAccount
+        }, req.body);
+        res.redirect("back");
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.editPost = editPost;
+const deleteAccount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idAccount = req.params.idAccount;
+        yield accounts_model_1.default.updateOne({
+            _id: idAccount
+        }, { deleted: true });
+        res.redirect("back");
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.deleteAccount = deleteAccount;

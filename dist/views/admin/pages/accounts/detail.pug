@@ -1,0 +1,24 @@
+extends ../../layouts/default.pug
+
+block main
+  h1 Thông tin tài khoản
+  
+  if(record.fullName)
+    div(class="mb-4") Họ Và Tên: <b>#{record.fullName}</b>
+
+  if(record.email)
+    div(class="mb-4") Email: <b>#{record.email}</b>
+
+  if(record.phone)
+    div(class="mb-4") SDT: <b>#{record.phone}</b>
+  
+  if(record.role)
+    div(class="mb-4") Quyền: <b>#{record.role}</b>
+  
+  if(record.status)
+    div(class="mb-4")
+      span Trạng thái: 
+      if(record.status=="active")
+        span(class="badge badge-success") Hoạt động
+      else
+        span(class="badge badge-danger") Dừng hoạt động

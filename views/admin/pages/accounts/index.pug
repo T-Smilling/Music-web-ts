@@ -54,16 +54,16 @@ block main
                       ) Dừng hoạt động
                   td 
                     a(
-                      href=`${prefixAdmin}/accounts/edit/${item.id}`
+                      href=`/${prefixAdmin}/accounts/edit/${item.id}`
                       class="btn btn-warning btn-sm"
                     ) Sửa
-                    button(
+                    a(
                       class="btn btn-danger btn-sm ml-1"
-                      button-delete
-                      data-id=item.id
+                      href=`/${prefixAdmin}/accounts/delete/${item.id}`
+                      
                     ) Xóa
                     a(
-                      href=`${prefixAdmin}/accounts/detail/${item.id}`
+                      href=`/${prefixAdmin}/accounts/detail/${item.id}`
                       class="btn btn-primary btn-sm"
                     ) Chi tiết 
             else 
