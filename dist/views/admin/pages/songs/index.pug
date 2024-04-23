@@ -9,12 +9,12 @@ block main
       .card-body
         .row
           .col-8
-            
           .col-4.text-right
-            a(
-              href=`/${prefixAdmin}/songs/create`
-              class="btn btn-outline-success"
-            ) + Thêm mới
+            if(role.permissions.includes("song_create"))
+              a(
+                href=`/${prefixAdmin}/songs/create`
+                class="btn btn-outline-success"
+              ) + Thêm mới
 
 
         table(

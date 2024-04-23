@@ -15,12 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.index = void 0;
 const topic_model_1 = __importDefault(require("../../models/topic.model"));
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const topics = yield topic_model_1.default.find({
-        deleted: false
-    });
-    res.render("admin/pages/topics/index", {
-        pageTitle: "Quản lý chủ đề",
-        topics: topics
-    });
+    try {
+        const topics = yield topic_model_1.default.find({
+            deleted: false
+        });
+        res.render("admin/pages/topics/index", {
+            pageTitle: "Quản lý chủ đề",
+            topics: topics
+        });
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
 });
 exports.index = index;

@@ -29,8 +29,10 @@ const search_route_1 = require("./search.route");
 const user_route_1 = require("./user.route");
 const userMiddleware = __importStar(require("../../middlewares/user.middleware"));
 const favorite_songs_route_1 = require("./favorite-songs.route");
+const SettingMiddleware = __importStar(require("../../middlewares/setting.middleware"));
 const ClientRoute = (app) => {
     app.use(userMiddleware.infoUser);
+    app.use(SettingMiddleware.SettingGeneral);
     app.use("/topics", topic_route_1.TopicRoute);
     app.use("/songs", song_route_1.SongRoute);
     app.use("/search", search_route_1.SearchRoute);

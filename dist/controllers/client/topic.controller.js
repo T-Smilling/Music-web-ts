@@ -15,12 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.topic = void 0;
 const topic_model_1 = __importDefault(require("../../models/topic.model"));
 const topic = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const topics = yield topic_model_1.default.find({
-        deleted: false
-    });
-    res.render("client/pages/topic/index", {
-        pageTitle: "Chủ đề bài hát",
-        topics: topics
-    });
+    try {
+        const topics = yield topic_model_1.default.find({
+            deleted: false
+        });
+        res.render("client/pages/topic/index", {
+            pageTitle: "Chủ đề bài hát",
+            topics: topics
+        });
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
 });
 exports.topic = topic;

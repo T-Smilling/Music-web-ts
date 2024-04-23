@@ -29,19 +29,19 @@ app.use(methodOverride('_method'));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
+
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
-
-
-// app.get("*",(req,res) => {
-//   res.render("client/pages/errors/404",{
-//     pageTitle:"404 Not Fount",
-//   });
-// });
 
 //Route
 ClientRoute(app);
 AdminRoute(app);
 //End Route
+
+app.get("*",(req,res) => {
+  res.render("client/pages/errors/404",{
+    pageTitle:"404 Not Fount",
+  });
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

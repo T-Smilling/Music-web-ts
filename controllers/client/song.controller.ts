@@ -165,23 +165,30 @@ export const favorite=async (req:Request,res:Response)=>{
 
 // [PATCH] /songs/listen/:idSong
 export const listen = async (req: Request, res: Response) => {
-  const idSong: string = req.params.idSong;
-
-  const song = await Song.findOne({
-    _id: idSong
-  });
-
-  const listen: number = song.listen + 1;
-
-  await Song.updateOne({
-    _id: idSong
-  }, {
-    listen: listen
-  });
+  try {
+    const idSong: string = req.params.idSong;
   
-  res.json({
-    code: 200,
-    message: "Thành công!",
-    listen: listen
-  });
+    const song = await Song.findOne({
+      _id: idSong
+    });
+  
+    const listen: number = song.listen + 1;
+  
+    await Song.updateOne({
+      _id: idSong
+    }, {
+      listen: listen
+    });
+    
+    res.json({
+      code: 200,
+      message: "Thành công!",
+      listen: listen
+    });
+  } catch (error) {
+    res.json({
+      code: 404,
+      message: "ERROR!",
+    });
+  }
 }

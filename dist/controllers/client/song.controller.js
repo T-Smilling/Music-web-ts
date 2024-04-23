@@ -156,20 +156,28 @@ const favorite = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.favorite = favorite;
 const listen = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const idSong = req.params.idSong;
-    const song = yield song_model_1.default.findOne({
-        _id: idSong
-    });
-    const listen = song.listen + 1;
-    yield song_model_1.default.updateOne({
-        _id: idSong
-    }, {
-        listen: listen
-    });
-    res.json({
-        code: 200,
-        message: "Thành công!",
-        listen: listen
-    });
+    try {
+        const idSong = req.params.idSong;
+        const song = yield song_model_1.default.findOne({
+            _id: idSong
+        });
+        const listen = song.listen + 1;
+        yield song_model_1.default.updateOne({
+            _id: idSong
+        }, {
+            listen: listen
+        });
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            listen: listen
+        });
+    }
+    catch (error) {
+        res.json({
+            code: 404,
+            message: "ERROR!",
+        });
+    }
 });
 exports.listen = listen;

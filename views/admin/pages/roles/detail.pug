@@ -1,0 +1,9 @@
+extends ../../layouts/default.pug
+
+block main
+  h1 Chi tiết 
+  
+  if(record.title)
+    h2(class="mb-4") #{record.title}
+  if(record.description)
+    div(class="mb-4") !{record.description}

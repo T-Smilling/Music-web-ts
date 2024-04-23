@@ -17,24 +17,29 @@ const favorite_song_model_1 = __importDefault(require("../../models/favorite-son
 const song_model_1 = __importDefault(require("../../models/song.model"));
 const singer_model_1 = __importDefault(require("../../models/singer.model"));
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const idUser = res.locals.user.id;
-    const favoriteSongs = yield favorite_song_model_1.default.find({
-        userId: idUser,
-        deleted: false
-    });
-    for (const item of favoriteSongs) {
-        const infoSong = yield song_model_1.default.findOne({
-            _id: item.songId
+    try {
+        const idUser = res.locals.user.id;
+        const favoriteSongs = yield favorite_song_model_1.default.find({
+            userId: idUser,
+            deleted: false
         });
-        const infoSinger = yield singer_model_1.default.findOne({
-            _id: infoSong.singerId
+        for (const item of favoriteSongs) {
+            const infoSong = yield song_model_1.default.findOne({
+                _id: item.songId
+            });
+            const infoSinger = yield singer_model_1.default.findOne({
+                _id: infoSong.singerId
+            });
+            item["infoSong"] = infoSong;
+            item["infoSinger"] = infoSinger;
+        }
+        res.render("client/pages/favorite-songs/index", {
+            pageTitle: "Bài hát yêu thích",
+            favoriteSongs: favoriteSongs
         });
-        item["infoSong"] = infoSong;
-        item["infoSinger"] = infoSinger;
     }
-    res.render("client/pages/favorite-songs/index", {
-        pageTitle: "Bài hát yêu thích",
-        favoriteSongs: favoriteSongs
-    });
+    catch (error) {
+        res.render("client/pages/errors/404");
+    }
 });
 exports.index = index;

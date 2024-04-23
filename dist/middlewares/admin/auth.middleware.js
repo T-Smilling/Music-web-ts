@@ -13,39 +13,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireAuth = void 0;
-const user_model_1 = __importDefault(require("../models/user.model"));
+const accounts_model_1 = __importDefault(require("../../models/accounts.model"));
+const role_model_1 = __importDefault(require("../../models/role.model"));
+const system_1 = require("../../config/system");
 const requireAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if (req.headers.authorization) {
-            const token = req.headers.authorization.split(" ")[1];
-            const user = yield user_model_1.default.findOne({
-                token: token,
-                deleted: false
-            }).select("-password -token");
-            if (!user) {
-                res.json({
-                    code: 400,
-                    message: "Không có quyền truy cập!"
-                });
-            }
-            else {
-                res.locals.user = user;
-                next();
-            }
+    if (!req.cookies.token) {
+        res.redirect(`/${system_1.systemConfig.prefixAdmin}/auth/login`);
+    }
+    else {
+        const user = yield accounts_model_1.default.findOne({ token: req.cookies.token });
+        if (!user) {
+            res.redirect(`/${system_1.systemConfig.prefixAdmin}/auth/login`);
         }
         else {
-            res.json({
-                code: 400,
-                message: "Vui lòng gửi kèm theo token!"
-            });
+            const role = yield role_model_1.default.findOne({
+                _id: user.role_id
+            }).select("title permissions");
+            res.locals.user = user;
+            res.locals.role = role;
+            next();
         }
-    }
-    catch (error) {
-        console.log(error);
-        res.json({
-            code: 401,
-            message: "Không có quyền truy cập!"
-        });
     }
 });
 exports.requireAuth = requireAuth;

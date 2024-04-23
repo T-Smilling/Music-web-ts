@@ -11,8 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.index = void 0;
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.render("admin/pages/dashboard/index", {
-        pageTitle: "Tổng quan",
-    });
+    try {
+        res.render("admin/pages/dashboard/index", {
+            pageTitle: "Tổng quan",
+        });
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
 });
 exports.index = index;
