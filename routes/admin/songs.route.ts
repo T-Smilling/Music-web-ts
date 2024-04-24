@@ -35,6 +35,8 @@ router.patch(
 );
 router.get("/detail/:idSong",controller.detail);
 router.delete("/delete/:idSong",controller.deleteSong);
+router.patch("/change-multi",controller.changeMulti);
+router.patch("/change-status/:status/:id",controller.changeStatus);
 
 export const SongAdminRouter:Router=router;
 

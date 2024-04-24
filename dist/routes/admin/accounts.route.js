@@ -34,4 +34,6 @@ router.get("/detail/:idAccount", controller.detail);
 router.get("/edit/:idAccount", controller.edit);
 router.post("/edit/:idAccount", controller.editPost);
 router.delete("/delete/:idAccount", controller.deleteAccount);
+router.patch("/change-multi", controller.changeMulti);
+router.patch("/change-status/:status/:id", controller.changeStatus);
 exports.AccountAdminRouter = router;

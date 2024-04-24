@@ -12,16 +12,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteSong = exports.detail = exports.editPatch = exports.edit = exports.createPost = exports.create = exports.index = void 0;
+exports.changeMulti = exports.changeStatus = exports.deleteSong = exports.detail = exports.editPatch = exports.edit = exports.createPost = exports.create = exports.index = void 0;
 const song_model_1 = __importDefault(require("../../models/song.model"));
 const topic_model_1 = __importDefault(require("../../models/topic.model"));
 const singer_model_1 = __importDefault(require("../../models/singer.model"));
 const system_1 = require("../../config/system");
+const filterStatus_helper_1 = require("../../helpers/filterStatus.helper");
+const pagination_helper_1 = __importDefault(require("../../helpers/pagination.helper"));
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const songs = yield song_model_1.default.find({
+        const find = {
             deleted: false
-        });
+        };
+        if (req.query.status) {
+            find.status = req.query.status;
+        }
+        const filterStatus = (0, filterStatus_helper_1.filterStatusHelper)(req.query);
+        const objectSearch = {
+            keyword: "",
+        };
+        if (req.query.keyword) {
+            objectSearch.keyword = req.query.keyword;
+            const regex = new RegExp(objectSearch.keyword, "i");
+            find.title = regex;
+        }
+        let initPagination = {
+            currentPage: 1,
+            limitItems: 3,
+        };
+        const countTasks = yield topic_model_1.default.countDocuments(find);
+        let objectPagination = (0, pagination_helper_1.default)(initPagination, req.query, countTasks);
+        const sort = {};
+        if (req.query.sortKey && req.query.sortValue) {
+            const sortKey = req.query.sortKey.toLocaleString();
+            sort[sortKey] = req.query.sortValue;
+        }
+        else {
+            let position;
+            sort[position] = "desc";
+        }
+        const songs = yield song_model_1.default.find(find).sort(sort).limit(objectPagination.limitItems).skip(objectPagination.skip);
         const newSongs = [];
         for (const song of songs) {
             const topic = yield topic_model_1.default.findOne({
@@ -43,7 +73,10 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         res.render("admin/pages/songs/index", {
             pageTitle: "Danh sách bài hát",
-            songs: newSongs
+            songs: newSongs,
+            keyword: objectSearch.keyword,
+            filterStatus: filterStatus,
+            pagination: objectPagination
         });
     }
     catch (error) {
@@ -222,3 +255,33 @@ const deleteSong = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.deleteSong = deleteSong;
+const changeStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const status = req.params.status;
+    const id = req.params.id;
+    yield song_model_1.default.updateOne({ _id: id }, {
+        status: status,
+    });
+    res.redirect("back");
+});
+exports.changeStatus = changeStatus;
+const changeMulti = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const type = req.body.type;
+    const ids = req.body.ids.split(", ");
+    switch (type) {
+        case "active":
+            yield song_model_1.default.updateMany({ _id: { $in: ids } }, { status: "active" });
+            break;
+        case "inactive":
+            yield song_model_1.default.updateMany({ _id: { $in: ids } }, { status: "inactive" });
+            break;
+        case "delete-all":
+            yield song_model_1.default.updateMany({ _id: { $in: ids } }, {
+                deleted: true,
+            });
+            break;
+        default:
+            break;
+    }
+    res.redirect("back");
+});
+exports.changeMulti = changeMulti;

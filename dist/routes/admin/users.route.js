@@ -32,4 +32,6 @@ router.get("/detail/:idUser", controller.detail);
 router.get("/edit/:idUser", controller.edit);
 router.post("/edit/:idUser", controller.editPost);
 router.delete("/delete/:idUser", controller.deleteUser);
+router.patch("/change-multi", controller.changeMulti);
+router.patch("/change-status/:status/:id", controller.changeStatus);
 exports.UserAdminRouter = router;

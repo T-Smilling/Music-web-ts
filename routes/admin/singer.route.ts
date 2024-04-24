@@ -18,5 +18,8 @@ router.patch(
   controller.editPatch
 );
 router.delete("/delete/:idSinger",controller.deleteSinger);
+router.patch("/change-multi",controller.changeMulti);
+router.patch("/change-status/:status/:id",controller.changeStatus);
+
 
 export const SingerAdminRouter:Router=router;

@@ -46,4 +46,6 @@ router.patch("/edit/:idSong", upload.fields([
 ]), uploadCloud.uploadFields, controller.editPatch);
 router.get("/detail/:idSong", controller.detail);
 router.delete("/delete/:idSong", controller.deleteSong);
+router.patch("/change-multi", controller.changeMulti);
+router.patch("/change-status/:status/:id", controller.changeStatus);
 exports.SongAdminRouter = router;

@@ -40,4 +40,6 @@ router.get("/detail/:idSinger", controller.detail);
 router.get("/edit/:idSinger", controller.edit);
 router.patch("/edit/:idSinger", upload.single("avatar"), uploadCloud.uploadSingle, controller.editPatch);
 router.delete("/delete/:idSinger", controller.deleteSinger);
+router.patch("/change-multi", controller.changeMulti);
+router.patch("/change-status/:status/:id", controller.changeStatus);
 exports.SingerAdminRouter = router;

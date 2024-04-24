@@ -3,13 +3,66 @@ import Song from "../../models/song.model";
 import Topic from "../../models/topic.model";
 import Singer from "../../models/singer.model";
 import { systemConfig } from "../../config/system";
+import { filterStatusHelper } from "../../helpers/filterStatus.helper";
+import paginationHelper from "../../helpers/pagination.helper";
 
 // [GET] /admin/songs/
 export const index = async (req: Request, res: Response) => {
   try {
-    const songs=await Song.find({
+    interface Find{
+      deleted:boolean,
+      status?:string|any,
+      title?:RegExp,
+    }
+    const find:Find={
       deleted:false
-    });
+    }
+    if(req.query.status){
+      find.status=req.query.status;
+    }
+    const filterStatus=filterStatusHelper(req.query);
+
+    //Search
+    interface Search{
+      keyword:string|any
+    }
+    const objectSearch:Search={
+      keyword:"",
+    }
+    if(req.query.keyword){
+      objectSearch.keyword=req.query.keyword;
+      const regex:RegExp=new RegExp(objectSearch.keyword,"i");
+      find.title=regex;
+    }
+    //End Search
+
+    //Pagination
+    let initPagination={
+      currentPage:1,
+      limitItems:3,
+    }
+    const countTasks= await Topic.countDocuments(find);
+    let objectPagination=paginationHelper(
+      initPagination,
+      req.query,
+      countTasks
+    );
+    //End Pagination
+
+    //Sort
+    const sort={};
+    if(req.query.sortKey && req.query.sortValue){
+      const sortKey=req.query.sortKey.toLocaleString();
+      sort[sortKey]=req.query.sortValue;
+    }   
+    else {
+      let position:string;
+      sort[position]="desc";
+    }
+    //End Sort
+
+    const songs = await Song.find(find).sort(sort).limit(objectPagination.limitItems).skip(objectPagination.skip);
+
     const newSongs=[];
     for (const song of songs) {
       const topic=await Topic.findOne({
@@ -31,7 +84,10 @@ export const index = async (req: Request, res: Response) => {
     }
     res.render("admin/pages/songs/index", {
       pageTitle: "Danh sách bài hát",
-      songs:newSongs
+      songs:newSongs,
+      keyword:objectSearch.keyword,
+      filterStatus:filterStatus,
+      pagination:objectPagination
     });
   } catch (error) {
     res.render("client/pages/errors/404",{
@@ -248,3 +304,53 @@ export const deleteSong = async (req: Request, res: Response) => {
     });
   }
 };
+
+//[PATCH] /admin/songs/change-status/:status/:id
+
+export const changeStatus= async (req: Request, res: Response) =>{
+  const status:string=req.params.status;
+  const id:string=req.params.id;
+  // const updatedBy={
+  //   account_id: res.locals.user.id,
+  //   updatedAt: new Date()
+  // }
+  await Song.updateOne({_id: id},
+  { 
+    status: status,
+  });
+  
+  res.redirect("back");
+}
+
+//[PATCH] /admin/songs/change-multi
+
+export const changeMulti= async (req: Request, res: Response) =>{
+  const type:string=req.body.type;
+  const ids:string=req.body.ids.split(", ");
+  // const updatedBy={
+  //   account_id: res.locals.user.id,
+  //   updatedAt: new Date()
+  // }
+  switch (type) {
+    case "active":
+      await Song.updateMany( {_id: { $in: ids }}, {status: "active"});
+      break;
+    case "inactive":
+      await Song.updateMany( {_id: { $in: ids }}, {status: "inactive"});
+      break;
+    case "delete-all":
+      await Song.updateMany(
+      {_id: { $in: ids }},
+      {
+        deleted: true,
+        // deletedBy:{
+        //   account_id:res.locals.user.id,
+        //   deletedAt: new Date(),
+        // }
+      });
+      break;
+    default:
+      break;
+  }
+  res.redirect("back");
+}

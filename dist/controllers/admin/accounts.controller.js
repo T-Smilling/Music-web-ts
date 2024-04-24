@@ -12,18 +12,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAccount = exports.editPost = exports.edit = exports.detail = exports.createPost = exports.create = exports.index = void 0;
+exports.changeMulti = exports.changeStatus = exports.deleteAccount = exports.editPost = exports.edit = exports.detail = exports.createPost = exports.create = exports.index = void 0;
 const md5_1 = __importDefault(require("md5"));
 const system_1 = require("../../config/system");
 const accounts_model_1 = __importDefault(require("../../models/accounts.model"));
 const role_model_1 = __importDefault(require("../../models/role.model"));
+const filterStatus_helper_1 = require("../../helpers/filterStatus.helper");
+const pagination_helper_1 = __importDefault(require("../../helpers/pagination.helper"));
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let find = {
+        const find = {
             deleted: false
         };
+        if (req.query.status) {
+            find.status = req.query.status;
+        }
+        const filterStatus = (0, filterStatus_helper_1.filterStatusHelper)(req.query);
+        const objectSearch = {
+            keyword: "",
+        };
+        if (req.query.keyword) {
+            objectSearch.keyword = req.query.keyword;
+            const regex = new RegExp(objectSearch.keyword, "i");
+            find.fullName = regex;
+        }
+        let initPagination = {
+            currentPage: 1,
+            limitItems: 3,
+        };
+        const countTasks = yield accounts_model_1.default.countDocuments(find);
+        let objectPagination = (0, pagination_helper_1.default)(initPagination, req.query, countTasks);
+        const sort = {};
+        if (req.query.sortKey && req.query.sortValue) {
+            const sortKey = req.query.sortKey.toLocaleString();
+            sort[sortKey] = req.query.sortValue;
+        }
+        const records = yield accounts_model_1.default.find(find).sort(sort).limit(objectPagination.limitItems).skip(objectPagination.skip).select("-password -token");
         const newRecord = [];
-        const records = yield accounts_model_1.default.find(find).select("-password -token");
         for (const record of records) {
             const role = yield role_model_1.default.findOne({
                 _id: record.role_id,
@@ -40,7 +65,10 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         res.render("admin/pages/accounts/index", {
             pageTitle: "Tài khoản Admin",
-            records: newRecord
+            records: newRecord,
+            keyword: objectSearch.keyword,
+            filterStatus: filterStatus,
+            pagination: objectPagination
         });
     }
     catch (error) {
@@ -194,3 +222,33 @@ const deleteAccount = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.deleteAccount = deleteAccount;
+const changeStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const status = req.params.status;
+    const id = req.params.id;
+    yield accounts_model_1.default.updateOne({ _id: id }, {
+        status: status,
+    });
+    res.redirect("back");
+});
+exports.changeStatus = changeStatus;
+const changeMulti = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const type = req.body.type;
+    const ids = req.body.ids.split(", ");
+    switch (type) {
+        case "active":
+            yield accounts_model_1.default.updateMany({ _id: { $in: ids } }, { status: "active" });
+            break;
+        case "inactive":
+            yield accounts_model_1.default.updateMany({ _id: { $in: ids } }, { status: "inactive" });
+            break;
+        case "delete-all":
+            yield accounts_model_1.default.updateMany({ _id: { $in: ids } }, {
+                deleted: true,
+            });
+            break;
+        default:
+            break;
+    }
+    res.redirect("back");
+});
+exports.changeMulti = changeMulti;
