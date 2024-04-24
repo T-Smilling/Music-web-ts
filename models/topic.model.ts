@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slug from "mongoose-slug-updater";
 
 const TopicSchema = new mongoose.Schema(
   {
@@ -6,7 +7,11 @@ const TopicSchema = new mongoose.Schema(
     avatar: String,
     description: String,
     status: String,
-    slug: String,
+    slug: {
+      type: String,
+      slug: "title",
+      unique: true
+    },
     deleted: {
       type: Boolean,
       default: false,

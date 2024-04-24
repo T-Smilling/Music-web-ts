@@ -178,3 +178,73 @@ export const editPatch = async (req: Request, res: Response) => {
     });
   }
 };
+
+//[GET] /admin/songs/detail/:idSong
+export const detail = async (req: Request, res: Response) => {
+  try {
+    const idSong=req.params.idSong;
+    const song=await Song.findOne({
+      _id:idSong,
+      deleted:false
+    });
+    const topic = await Topic.findOne({
+      _id:song.topicId,
+      deleted: false,
+      status: "active"
+    }).select("title");
+  
+    const singers = await Singer.findOne({
+      _id:song.singerId,
+      deleted: false,
+      status: "active"
+    }).select("fullName"); 
+
+    interface GetData{
+      title: String,
+      avatar: String,
+      description: String,
+      singerId: String,
+      lyrics:String,
+      audio:String,
+      status:String,
+      topicId: String,
+      listen:Number,
+      like:Number,
+    };
+
+    const data:GetData={
+      title: song.title,
+      avatar: song.avatar,
+      description: song.description,
+      singerId: singers.fullName,
+      topicId: topic.title,
+      lyrics: song.lyrics,
+      audio: song.audio,
+      status: song.status,
+      like:song.like.length,
+      listen:song.listen
+    }
+    res.render("admin/pages/songs/detail", {
+      pageTitle: "Chi tiết bài hát",
+      data:data
+    });
+  } catch (error) {
+    res.render("client/pages/errors/404",{
+      pageTitle:"404 Not Fount",
+    });
+  }
+};
+//[DELETE] /admin/songs/delete/:idSong
+export const deleteSong = async (req: Request, res: Response) => {
+  try {
+    const idSong=req.params.idSong;
+    await Song.updateOne({
+      _id:idSong
+    },{deleted:true});
+    res.redirect("back");
+  } catch (error) {
+    res.render("client/pages/errors/404",{
+      pageTitle:"404 Not Fount",
+    });
+  }
+};

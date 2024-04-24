@@ -53,9 +53,10 @@ block main
                       href=`/${prefixAdmin}/users/edit/${item.id}`
                       class="btn btn-warning btn-sm"
                     ) Sửa
-                    a(
+                    button(
                       class="btn btn-danger btn-sm ml-1"
-                      href=`/${prefixAdmin}/users/delete/${item.id}`
+                      button-delete
+                      data-id=item.id
                     ) Xóa
                     a(
                       href=`/${prefixAdmin}/users/detail/${item.id}`
@@ -64,3 +65,9 @@ block main
             else 
               tr 
                 td(colspan = "4" class = "text-center") Chưa có tài khoản được tạo
+  form(
+    action=""
+    method="POST"
+    id="form-delete"
+    data-path=`/${prefixAdmin}/users/delete`
+  )

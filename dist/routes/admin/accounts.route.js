@@ -33,5 +33,5 @@ router.post("/create", controller.createPost);
 router.get("/detail/:idAccount", controller.detail);
 router.get("/edit/:idAccount", controller.edit);
 router.post("/edit/:idAccount", controller.editPost);
-router.get("/delete/:idAccount", controller.deleteAccount);
+router.delete("/delete/:idAccount", controller.deleteAccount);
 exports.AccountAdminRouter = router;

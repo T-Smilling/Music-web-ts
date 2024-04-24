@@ -1,0 +1,28 @@
+extends ../../layouts/default.pug
+
+block main
+  h1 Thông tin chủ đề
+  
+  if(topic.title)
+    div(class="mb-4") Họ Và Tên: <b>#{topic.title}</b>
+  if(topic.avatar)
+    img(
+      src=topic.avatar
+      alt=topic.title
+      width="100px"
+      height="100px"
+      style="margin-bottom:25px"
+    )
+  if(topic.email)
+    div(class="mb-4") Email: <b>#{topic.email}</b>
+
+  if(topic.description)
+    div(class="mb-4") Mô tả: <b>!{topic.description}</b>
+
+  if(topic.status)
+    div(class="mb-4")
+      span Trạng thái: 
+      if(topic.status=="active")
+        span(class="badge badge-success") Hoạt động
+      else
+        span(class="badge badge-danger") Dừng hoạt động

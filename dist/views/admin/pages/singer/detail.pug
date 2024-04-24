@@ -1,0 +1,22 @@
+extends ../../layouts/default.pug
+
+block main
+  h1 Thông tin ca sĩ
+  
+  if(singer.fullName)
+    div(class="mb-4") Họ Và Tên: <b>#{singer.fullName}</b>
+  if(singer.avatar)
+    img(
+      src=singer.avatar
+      alt=singer.fullName
+      width="100px"
+      height="100px"
+      style="margin-bottom:25px"
+    )
+  if(singer.status)
+    div(class="mb-4")
+      span Trạng thái: 
+      if(singer.status=="active")
+        span(class="badge badge-success") Hoạt động
+      else
+        span(class="badge badge-danger") Dừng hoạt động

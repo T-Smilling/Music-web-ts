@@ -36,9 +36,10 @@ block main
                         class="btn btn-warning btn-sm"
                       ) Sửa
                     if(role.permissions.includes("roles_delete"))
-                      a(
+                      button(
                         class="btn btn-danger btn-sm ml-1"
-                        href=`/${prefixAdmin}/roles/delete/${item.id}`
+                        button-delete
+                        data-id=item.id
                       ) Xóa
                     a(
                       href=`/${prefixAdmin}/roles/detail/${item.id}`
@@ -47,3 +48,9 @@ block main
             else 
               tr 
                 td(colspan = "4" class = "text-center") Chưa có nhóm quyền được tạo
+  form(
+    action=""
+    method="POST"
+    id="form-delete"
+    data-path=`/${prefixAdmin}/roles/delete`
+  )

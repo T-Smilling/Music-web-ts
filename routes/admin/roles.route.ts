@@ -11,6 +11,6 @@ router.get("/permissions",controller.permissions);
 router.patch("/permissions",controller.permissionsPatch);
 router.get("/edit/:id",controller.edit);
 router.patch("/edit/:id",controller.editPatch);
-router.get("/delete/:id",controller.deleteRole);
+router.delete("/delete/:id",controller.deleteRole);
 
 export const RoleAdminRouter:Router=router;

@@ -22,10 +22,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TopicAdminRouter = void 0;
 const express_1 = require("express");
 const router = (0, express_1.Router)();
+const multer_1 = __importDefault(require("multer"));
 const controller = __importStar(require("../../controllers/admin/topics.controller"));
+const uploadCloud = __importStar(require("../../middlewares/admin/uploadCloud.middleware"));
+const upload = (0, multer_1.default)();
 router.get("/", controller.index);
+router.get("/create", controller.create);
+router.post("/create", upload.fields([
+    { name: 'avatar', maxCount: 1 },
+]), uploadCloud.uploadFields, controller.createPost);
+router.get("/detail/:idTopic", controller.detail);
+router.get("/edit/:idTopic", controller.edit);
+router.patch("/edit/:idTopic", upload.single("avatar"), uploadCloud.uploadSingle, controller.editPatch);
+router.delete("/delete/:idTopic", controller.deleteTopic);
+router.patch("/change-status/:status/:id", controller.changeStatus);
+router.patch("/change-multi", controller.changeMulti);
 exports.TopicAdminRouter = router;

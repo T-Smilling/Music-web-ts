@@ -1,0 +1,52 @@
+extends ../../layouts/default.pug
+
+block main
+  h1 Thông tin bài hát
+  
+  if(data.title)
+    div(class="mb-4") Tên bài hát: <b>#{data.title}</b>
+  if(data.avatar)
+    img(
+      src=data.avatar
+      alt=data.title
+      width="100px"
+      height="100px"
+      style="margin-bottom:25px"
+    )
+  if(data.description)
+    div(class="mb-4") Mô tả: <b>!{data.description}</b>
+  if(data.singerId)
+    div(class="mb-4") Ca sĩ: <b>!{data.singerId}</b>
+  if(data.topicId)
+    div(class="mb-4") Chủ đề bài hát: <b>!{data.topicId}</b>
+  if(data.lyrics)
+    div(class="mb-4") Lời bài hát: <b>!{data.lyrics}</b>
+
+  div(
+    class="form-group"
+    upload-audio
+  )
+    label(for="audio") File âm thanh
+    input(
+      type="file"
+      class="form-control-file"
+      id="audio"
+      name="audio"
+      accept="audio/*"
+      upload-audio-input
+    )
+    audio(controls upload-audio-play)
+      source(src=data.audio)
+
+  if(data.like >= 0 )
+    div(class="mb-4") Lượt thích: <b>!{data.like}</b>
+  if(data.listen >= 0)
+    div(class="mb-4") Lượt nghe bài hát: <b>!{data.listen}</b>
+
+  if(data.status)
+    div(class="mb-4")
+      span Trạng thái: 
+      if(data.status=="active")
+        span(class="badge badge-success") Hoạt động
+      else
+        span(class="badge badge-danger") Dừng hoạt động

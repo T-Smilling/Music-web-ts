@@ -81,7 +81,7 @@ export const editPost = async (req: Request, res: Response) => {
     });
   }
 };
-// [GET] /admin/users/detele/:idUser
+// [DELETE] /admin/users/detele/:idUser
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const idUser:string=req.params.idUser;

@@ -132,7 +132,7 @@ export const editPatch = async (req: Request, res: Response) => {
   }
 };
 
-// [GET] /admin/roles/edit/:id
+// [DELETE] /admin/roles/delete/:id
 export const deleteRole = async (req: Request, res: Response) => {
   try {
     const idRole:string=req.params.id;

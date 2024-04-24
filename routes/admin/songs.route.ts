@@ -33,6 +33,8 @@ router.patch(
   uploadCloud.uploadFields,
   controller.editPatch
 );
+router.get("/detail/:idSong",controller.detail);
+router.delete("/delete/:idSong",controller.deleteSong);
 
 export const SongAdminRouter:Router=router;
 

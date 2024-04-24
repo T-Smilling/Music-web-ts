@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editPatch = exports.edit = exports.createPost = exports.create = exports.index = void 0;
+exports.deleteSong = exports.detail = exports.editPatch = exports.edit = exports.createPost = exports.create = exports.index = void 0;
 const song_model_1 = __importDefault(require("../../models/song.model"));
 const topic_model_1 = __importDefault(require("../../models/topic.model"));
 const singer_model_1 = __importDefault(require("../../models/singer.model"));
@@ -165,3 +165,60 @@ const editPatch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.editPatch = editPatch;
+const detail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idSong = req.params.idSong;
+        const song = yield song_model_1.default.findOne({
+            _id: idSong,
+            deleted: false
+        });
+        const topic = yield topic_model_1.default.findOne({
+            _id: song.topicId,
+            deleted: false,
+            status: "active"
+        }).select("title");
+        const singers = yield singer_model_1.default.findOne({
+            _id: song.singerId,
+            deleted: false,
+            status: "active"
+        }).select("fullName");
+        ;
+        const data = {
+            title: song.title,
+            avatar: song.avatar,
+            description: song.description,
+            singerId: singers.fullName,
+            topicId: topic.title,
+            lyrics: song.lyrics,
+            audio: song.audio,
+            status: song.status,
+            like: song.like.length,
+            listen: song.listen
+        };
+        res.render("admin/pages/songs/detail", {
+            pageTitle: "Chi tiết bài hát",
+            data: data
+        });
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.detail = detail;
+const deleteSong = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idSong = req.params.idSong;
+        yield song_model_1.default.updateOne({
+            _id: idSong
+        }, { deleted: true });
+        res.redirect("back");
+    }
+    catch (error) {
+        res.render("client/pages/errors/404", {
+            pageTitle: "404 Not Fount",
+        });
+    }
+});
+exports.deleteSong = deleteSong;

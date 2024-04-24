@@ -9,7 +9,11 @@ const TopicSchema = new mongoose_1.default.Schema({
     avatar: String,
     description: String,
     status: String,
-    slug: String,
+    slug: {
+        type: String,
+        slug: "title",
+        unique: true
+    },
     deleted: {
         type: Boolean,
         default: false,

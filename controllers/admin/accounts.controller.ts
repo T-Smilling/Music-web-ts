@@ -164,7 +164,7 @@ export const editPost = async (req: Request, res: Response) => {
   }
 };
 
-// [GET] /admin/accounts/delete/:idAccount
+// [DELETE] /admin/accounts/delete/:idAccount
 export const deleteAccount = async (req: Request, res: Response) => {
   try {
     const idAccount:string=req.params.idAccount;
