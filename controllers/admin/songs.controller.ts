@@ -5,6 +5,7 @@ import Singer from "../../models/singer.model";
 import { systemConfig } from "../../config/system";
 import { filterStatusHelper } from "../../helpers/filterStatus.helper";
 import paginationHelper from "../../helpers/pagination.helper";
+import Account from "../../models/accounts.model";
 
 // [GET] /admin/songs/
 export const index = async (req: Request, res: Response) => {
@@ -62,7 +63,6 @@ export const index = async (req: Request, res: Response) => {
     //End Sort
 
     const songs = await Song.find(find).sort(sort).limit(objectPagination.limitItems).skip(objectPagination.skip);
-
     const newSongs=[];
     for (const song of songs) {
       const topic=await Topic.findOne({
@@ -71,6 +71,21 @@ export const index = async (req: Request, res: Response) => {
       const sing=await Singer.findOne({
         _id:song.singerId
       }).select("fullName");
+
+      const user=await Account.findOne({
+        _id: song.createdBy.account_id
+      });
+      let accountFullName:string;
+      if(user){
+        accountFullName=user.fullName;
+      }
+      var updatedBy=song.updatedBy.slice(-1)[0];
+      if(updatedBy){
+        const userUpdated=await Account.findOne({
+          _id:updatedBy.account_id
+        });
+        updatedBy.accountFullName=userUpdated.fullName;
+      }
       newSongs.push({
         id:song.id,
         title:song.title,
@@ -79,7 +94,9 @@ export const index = async (req: Request, res: Response) => {
         status:song.status,
         slug:song.slug,
         topic:topic.title,
-        singer:sing.fullName
+        singer:sing.fullName,
+        accountFullName:accountFullName,
+        updatedBy:(updatedBy ? updatedBy:[])
       })
     }
     res.render("admin/pages/songs/index", {
@@ -130,6 +147,10 @@ export const createPost = async (req: Request, res: Response) => {
     if(req.body.audio) {
       req.body.audio = req.body.audio[0];
     }
+    req.body.createdBy={
+      account_id: res.locals.user.id,
+      createAt:new Date()
+    }
     interface SaveBody{
       title: String,
       avatar: String,
@@ -139,6 +160,10 @@ export const createPost = async (req: Request, res: Response) => {
       audio:String,
       status:String,
       topicId: String,
+      createdBy:{
+        account_id: String,
+        createAt:Date
+      },
     };
   
     const data:SaveBody={
@@ -150,6 +175,7 @@ export const createPost = async (req: Request, res: Response) => {
       lyrics: req.body.lyrics,
       audio: req.body.audio,
       status: req.body.status,
+      createdBy:req.body.createdBy
     }
     const song = new Song(data);
     await song.save();
@@ -197,7 +223,10 @@ export const edit = async (req: Request, res: Response) => {
 export const editPatch = async (req: Request, res: Response) => {
   try {
     const idSong=req.params.idSong;
-  
+    const updatedBy={
+      account_id: res.locals.user.id,
+      updatedAt: new Date()
+    }
     interface SaveBody{
       title: String,
       avatar?: String,
@@ -226,7 +255,7 @@ export const editPatch = async (req: Request, res: Response) => {
     }
     await Song.updateOne({
       _id:idSong
-    },data)
+    },{...data,$push:{updatedBy:updatedBy}})
     res.redirect("back");
   } catch (error) {
     res.render("client/pages/errors/404",{
@@ -296,7 +325,11 @@ export const deleteSong = async (req: Request, res: Response) => {
     const idSong=req.params.idSong;
     await Song.updateOne({
       _id:idSong
-    },{deleted:true});
+    },{deleted:true,
+      deletedBy:{
+        account_id:res.locals.user.id,
+        deleteAt:new Date(),
+    }});
     res.redirect("back");
   } catch (error) {
     res.render("client/pages/errors/404",{
@@ -310,13 +343,14 @@ export const deleteSong = async (req: Request, res: Response) => {
 export const changeStatus= async (req: Request, res: Response) =>{
   const status:string=req.params.status;
   const id:string=req.params.id;
-  // const updatedBy={
-  //   account_id: res.locals.user.id,
-  //   updatedAt: new Date()
-  // }
+  const updatedBy={
+    account_id: res.locals.user.id,
+    updatedAt: new Date()
+  }
   await Song.updateOne({_id: id},
   { 
     status: status,
+    $push:{updatedBy:updatedBy}
   });
   
   res.redirect("back");
@@ -327,26 +361,26 @@ export const changeStatus= async (req: Request, res: Response) =>{
 export const changeMulti= async (req: Request, res: Response) =>{
   const type:string=req.body.type;
   const ids:string=req.body.ids.split(", ");
-  // const updatedBy={
-  //   account_id: res.locals.user.id,
-  //   updatedAt: new Date()
-  // }
+  const updatedBy={
+    account_id: res.locals.user.id,
+    updatedAt: new Date()
+  }
   switch (type) {
     case "active":
-      await Song.updateMany( {_id: { $in: ids }}, {status: "active"});
+      await Song.updateMany( {_id: { $in: ids }}, {status: "active",$push:{updatedBy:updatedBy}});
       break;
     case "inactive":
-      await Song.updateMany( {_id: { $in: ids }}, {status: "inactive"});
+      await Song.updateMany( {_id: { $in: ids }}, {status: "inactive",$push:{updatedBy:updatedBy}});
       break;
     case "delete-all":
       await Song.updateMany(
       {_id: { $in: ids }},
       {
         deleted: true,
-        // deletedBy:{
-        //   account_id:res.locals.user.id,
-        //   deletedAt: new Date(),
-        // }
+        deletedBy:{
+          account_id:res.locals.user.id,
+          deletedAt: new Date(),
+        }
       });
       break;
     default:

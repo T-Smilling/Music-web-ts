@@ -2,3 +2,58 @@ extends ../../layouts/default.pug
 
 block main
   h1 Trang tổng quan
+
+  .row.mt-4 
+    .col-12 
+      .card.mb-4 
+        .card-header Thông tin tài khoản
+        .card-body
+          if(user.avatar)
+            img(src=user.avatar width="150px" class="mb-3")
+          if(user.fullName)
+            p Họ và tên: <b> #{user.fullName} </b>
+          if(user.email)
+            p Email: <b> #{user.email} </b>
+          if(user.phone)
+            p Số điện thoại: <b> #{user.phone} </b>
+          p 
+          if(role.title)
+            p Phân quyền: <b> #{role.title} </b>
+
+    .col-6 
+      .card.mb-4 
+        .card-header Chủ đề bài hát
+        .card-body
+          p Số lượng: <b>#{statistic.Topics.total}</b>
+          p Hoạt động: <b>#{statistic.Topics.active}</b>
+          p Dừng hoạt động: <b>#{statistic.Topics.inactive}</b>
+    .col-6 
+      .card.mb-4 
+        .card-header Danh sách bài hát 
+        .card-body
+          p Số lượng: <b>#{statistic.Songs.total}</b>
+          p Hoạt động: <b>#{statistic.Songs.active}</b>
+          p Dừng hoạt động: <b>#{statistic.Songs.inactive}</b>
+    .col-6 
+      .card.mb-4 
+        .card-header Danh sách ca sĩ
+        .card-body
+          p Số lượng: <b>#{statistic.Singers.total}</b>
+          p Hoạt động: <b>#{statistic.Singers.active}</b>
+          p Dừng hoạt động: <b>#{statistic.Singers.inactive}</b>
+    .col-6 
+      .card.mb-4 
+        .card-header Tài khoản Admin
+        .card-body
+          p Số lượng: <b>#{statistic.Accounts.total}</b>
+          p Hoạt động: <b>#{statistic.Accounts.active}</b>
+          p Dừng hoạt động: <b>#{statistic.Accounts.inactive}</b>
+    .col-6 
+      .card.mb-4 
+        .card-header Tài khoản user
+        .card-body
+          p Số lượng: <b>#{statistic.Users.total}</b>
+          p Hoạt động: <b>#{statistic.Users.active}</b>
+          p Dừng hoạt động: <b>#{statistic.Users.inactive}</b>
+          
+          

@@ -22,24 +22,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AccountAdminRouter = void 0;
+exports.HomeRoute = void 0;
 const express_1 = require("express");
 const router = (0, express_1.Router)();
-const multer_1 = __importDefault(require("multer"));
-const controller = __importStar(require("../../controllers/admin/accounts.controller"));
-const uploadCloud = __importStar(require("../../middlewares/admin/uploadCloud.middleware"));
-const upload = (0, multer_1.default)();
+const controller = __importStar(require("../../controllers/client/home.controller"));
 router.get("/", controller.index);
-router.get("/create", controller.create);
-router.post("/create", upload.single("avatar"), uploadCloud.uploadSingle, controller.createPost);
-router.get("/detail/:idAccount", controller.detail);
-router.get("/edit/:idAccount", controller.edit);
-router.post("/edit/:idAccount", upload.single("avatar"), uploadCloud.uploadSingle, controller.editPost);
-router.delete("/delete/:idAccount", controller.deleteAccount);
-router.patch("/change-multi", controller.changeMulti);
-router.patch("/change-status/:status/:id", controller.changeStatus);
-exports.AccountAdminRouter = router;
+exports.HomeRoute = router;

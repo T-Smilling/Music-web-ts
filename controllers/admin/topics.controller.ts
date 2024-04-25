@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import Topic from "../../models/topic.model";
 import paginationHelper from "../../helpers/pagination.helper";
 import { filterStatusHelper } from "../../helpers/filterStatus.helper";
+import { systemConfig } from "../../config/system";
+import Account from "../../models/accounts.model";
 
 // [GET] /admin/topics/
 export const index = async (req: Request, res: Response) => {
@@ -52,13 +54,23 @@ export const index = async (req: Request, res: Response) => {
       const sortKey=req.query.sortKey.toLocaleString();
       sort[sortKey]=req.query.sortValue;
     }   
-    else {
-      let position:string;
-      sort[position]="desc";
-    }
     //End Sort
-
     const topics = await Topic.find(find).sort(sort).limit(objectPagination.limitItems).skip(objectPagination.skip);
+    for(const topic of topics){
+      const user=await Account.findOne({
+        _id: topic.createdBy.account_id
+      });
+      if(user){
+        topic["accountFullName"]=user.fullName;
+      }
+      const updatedBy=topic.updatedBy.slice(-1)[0];
+      if(updatedBy){
+        const userUpdated=await Account.findOne({
+          _id:updatedBy.account_id
+        });
+        updatedBy["accountFullName"]=userUpdated.fullName;
+      }
+    }
     res.render("admin/pages/topics/index", {
       pageTitle: "Quản lý chủ đề",
       topics: topics,
@@ -89,13 +101,16 @@ export const create = async (req: Request, res: Response) => {
 // [POST] /admin/topics/cretae
 export const createPost = async (req: Request, res: Response) => {
   try {
-    if(req.body.avatar){
-      req.body.avatar=req.body.avatar[0];
+    req.body.avatar=req.body.avatar[0];
+    req.body.createdBy={
+      account_id: res.locals.user.id,
+      createAt:new Date()
     }
     const record=new Topic(req.body);
     await record.save();
-    res.redirect("back");
+    res.redirect(`/${systemConfig.prefixAdmin}/topics`);
   } catch (error) {
+    console.log(error);
     res.render("client/pages/errors/404",{
       pageTitle:"404 Not Fount",
     });
@@ -144,9 +159,16 @@ export const edit = async (req: Request, res: Response) => {
 export const editPatch = async (req: Request, res: Response) => {
   try {
     const idTopic:string=req.params.idTopic;
+    const updatedBy={
+      account_id: res.locals.user.id,
+      updatedAt: new Date()
+    }
     await Topic.updateOne({
       _id:idTopic
-    },req.body);
+    },{
+      ...req.body,
+      $push:{updatedBy:updatedBy}
+    });
     res.redirect("back");
   } catch (error) {
     res.render("client/pages/errors/404",{
@@ -160,7 +182,11 @@ export const deleteTopic = async (req: Request, res: Response) => {
     const idTopic:string=req.params.idTopic;
     await Topic.updateOne({
       _id:idTopic
-    },{deleted:true});
+    },{deleted:true,
+      deletedBy:{
+        account_id:res.locals.user.id,
+        deleteAt:new Date(),
+    }});
     res.redirect("back");
   } catch (error) {
     res.render("client/pages/errors/404",{
@@ -175,13 +201,14 @@ export const deleteTopic = async (req: Request, res: Response) => {
 export const changeStatus= async (req: Request, res: Response) =>{
   const status:string=req.params.status;
   const id:string=req.params.id;
-  // const updatedBy={
-  //   account_id: res.locals.user.id,
-  //   updatedAt: new Date()
-  // }
+  const updatedBy={
+    account_id: res.locals.user.id,
+    updatedAt: new Date()
+  }
   await Topic.updateOne({_id: id},
   { 
     status: status,
+    $push:{updatedBy:updatedBy}
   });
   
   res.redirect("back");
@@ -192,26 +219,26 @@ export const changeStatus= async (req: Request, res: Response) =>{
 export const changeMulti= async (req: Request, res: Response) =>{
   const type:string=req.body.type;
   const ids:string=req.body.ids.split(", ");
-  // const updatedBy={
-  //   account_id: res.locals.user.id,
-  //   updatedAt: new Date()
-  // }
+  const updatedBy={
+    account_id: res.locals.user.id,
+    updatedAt: new Date()
+  }
   switch (type) {
     case "active":
-      await Topic.updateMany( {_id: { $in: ids }}, {status: "active"});
+      await Topic.updateMany( {_id: { $in: ids }}, {status: "active",$push:{updatedBy:updatedBy}});
       break;
     case "inactive":
-      await Topic.updateMany( {_id: { $in: ids }}, {status: "inactive"});
+      await Topic.updateMany( {_id: { $in: ids }}, {status: "inactive",$push:{updatedBy:updatedBy}});
       break;
     case "delete-all":
       await Topic.updateMany(
       {_id: { $in: ids }},
       {
         deleted: true,
-        // deletedBy:{
-        //   account_id:res.locals.user.id,
-        //   deletedAt: new Date(),
-        // }
+        deletedBy:{
+          account_id:res.locals.user.id,
+          deletedAt: new Date(),
+        }
       });
       break;
     default:

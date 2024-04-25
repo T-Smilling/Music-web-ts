@@ -8,6 +8,7 @@ const generate_helper_1 = require("../helpers/generate.helper");
 const AccountSchema = new mongoose_1.default.Schema({
     fullName: String,
     password: String,
+    avatar: String,
     email: String,
     token: {
         type: String,

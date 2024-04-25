@@ -44,6 +44,24 @@ block main
         name="phone"
         value=record.phone
       )
+    div(
+        class="form-group"
+        upload-image
+      )
+        label(for="avatar") Ảnh
+        input(
+          type="file"
+          class="form-control-file"
+          id="avatar"
+          name="avatar"
+          accept="image/*"
+          upload-image-input
+        )
+        img(
+          src=record.avatar
+          class="image-preview"
+          upload-image-preview
+        )
 
     div(class="form-group")
       label(for="role_id") Phân quyền

@@ -19,6 +19,7 @@ const singer_model_1 = __importDefault(require("../../models/singer.model"));
 const system_1 = require("../../config/system");
 const filterStatus_helper_1 = require("../../helpers/filterStatus.helper");
 const pagination_helper_1 = __importDefault(require("../../helpers/pagination.helper"));
+const accounts_model_1 = __importDefault(require("../../models/accounts.model"));
 const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const find = {
@@ -60,6 +61,20 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const sing = yield singer_model_1.default.findOne({
                 _id: song.singerId
             }).select("fullName");
+            const user = yield accounts_model_1.default.findOne({
+                _id: song.createdBy.account_id
+            });
+            let accountFullName;
+            if (user) {
+                accountFullName = user.fullName;
+            }
+            var updatedBy = song.updatedBy.slice(-1)[0];
+            if (updatedBy) {
+                const userUpdated = yield accounts_model_1.default.findOne({
+                    _id: updatedBy.account_id
+                });
+                updatedBy.accountFullName = userUpdated.fullName;
+            }
             newSongs.push({
                 id: song.id,
                 title: song.title,
@@ -68,7 +83,9 @@ const index = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 status: song.status,
                 slug: song.slug,
                 topic: topic.title,
-                singer: sing.fullName
+                singer: sing.fullName,
+                accountFullName: accountFullName,
+                updatedBy: (updatedBy ? updatedBy : [])
             });
         }
         res.render("admin/pages/songs/index", {
@@ -117,6 +134,10 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         if (req.body.audio) {
             req.body.audio = req.body.audio[0];
         }
+        req.body.createdBy = {
+            account_id: res.locals.user.id,
+            createAt: new Date()
+        };
         ;
         const data = {
             title: req.body.title,
@@ -127,6 +148,7 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             lyrics: req.body.lyrics,
             audio: req.body.audio,
             status: req.body.status,
+            createdBy: req.body.createdBy
         };
         const song = new song_model_1.default(data);
         yield song.save();
@@ -171,6 +193,10 @@ exports.edit = edit;
 const editPatch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const idSong = req.params.idSong;
+        const updatedBy = {
+            account_id: res.locals.user.id,
+            updatedAt: new Date()
+        };
         ;
         const data = {
             title: req.body.title,
@@ -188,7 +214,7 @@ const editPatch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         yield song_model_1.default.updateOne({
             _id: idSong
-        }, data);
+        }, Object.assign(Object.assign({}, data), { $push: { updatedBy: updatedBy } }));
         res.redirect("back");
     }
     catch (error) {
@@ -245,7 +271,11 @@ const deleteSong = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const idSong = req.params.idSong;
         yield song_model_1.default.updateOne({
             _id: idSong
-        }, { deleted: true });
+        }, { deleted: true,
+            deletedBy: {
+                account_id: res.locals.user.id,
+                deleteAt: new Date(),
+            } });
         res.redirect("back");
     }
     catch (error) {
@@ -258,8 +288,13 @@ exports.deleteSong = deleteSong;
 const changeStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const status = req.params.status;
     const id = req.params.id;
+    const updatedBy = {
+        account_id: res.locals.user.id,
+        updatedAt: new Date()
+    };
     yield song_model_1.default.updateOne({ _id: id }, {
         status: status,
+        $push: { updatedBy: updatedBy }
     });
     res.redirect("back");
 });
@@ -267,16 +302,24 @@ exports.changeStatus = changeStatus;
 const changeMulti = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const type = req.body.type;
     const ids = req.body.ids.split(", ");
+    const updatedBy = {
+        account_id: res.locals.user.id,
+        updatedAt: new Date()
+    };
     switch (type) {
         case "active":
-            yield song_model_1.default.updateMany({ _id: { $in: ids } }, { status: "active" });
+            yield song_model_1.default.updateMany({ _id: { $in: ids } }, { status: "active", $push: { updatedBy: updatedBy } });
             break;
         case "inactive":
-            yield song_model_1.default.updateMany({ _id: { $in: ids } }, { status: "inactive" });
+            yield song_model_1.default.updateMany({ _id: { $in: ids } }, { status: "inactive", $push: { updatedBy: updatedBy } });
             break;
         case "delete-all":
             yield song_model_1.default.updateMany({ _id: { $in: ids } }, {
                 deleted: true,
+                deletedBy: {
+                    account_id: res.locals.user.id,
+                    deletedAt: new Date(),
+                }
             });
             break;
         default:

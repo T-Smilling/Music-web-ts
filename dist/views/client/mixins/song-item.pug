@@ -1,0 +1,13 @@
+mixin songs-item(item)
+  .col-4.mb-3 
+    .song-item
+      .inner-image 
+        img(src=item.avatar, alt=item.title)
+        if(item.featured=="1")
+          .inner-featured Nổi bật
+      .inner-content 
+        h3.inner-title 
+          a(href=`/songs/detail/${item.slug}`) #{item.title}
+        .inner-singer <i class="fa-solid fa-microphone-lines"></i> #{item.infoSinger.fullName}
+        .inner-like <i class="fa-solid fa-thumbs-up"></i> #{item.like.length}
+        .inner-time <i class="fa-regular fa-clock"></i> Hôm nay

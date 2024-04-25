@@ -4,7 +4,7 @@ import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
 import cookieParser from 'cookie-parser';
-import multer from "multer"
+import moment from "moment";
 
 import methodOverride from "method-override";
 
@@ -31,6 +31,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
+app.locals.moment=moment;
 
 //Route
 ClientRoute(app);

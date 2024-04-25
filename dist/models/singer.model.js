@@ -20,6 +20,23 @@ const singerSchema = new mongoose_1.default.Schema({
         default: false,
     },
     deletedAt: Date,
+    createdBy: {
+        account_id: String,
+        createAt: {
+            type: Date,
+            default: Date.now
+        }
+    },
+    deletedBy: {
+        account_id: String,
+        deletedAt: Date
+    },
+    updatedBy: [
+        {
+            account_id: String,
+            updatedAt: Date
+        },
+    ],
 }, {
     timestamps: true,
 });

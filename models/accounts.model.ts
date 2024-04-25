@@ -5,6 +5,7 @@ const AccountSchema = new mongoose.Schema(
   {
     fullName: String,
     password: String,
+    avatar: String,
     email: String,
     token:{
       type:String,

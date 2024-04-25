@@ -31,6 +31,7 @@ const path_1 = __importDefault(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const moment_1 = __importDefault(require("moment"));
 const method_override_1 = __importDefault(require("method-override"));
 const database = __importStar(require("./config/database"));
 const system_1 = require("./config/system");
@@ -48,6 +49,7 @@ app.use((0, method_override_1.default)('_method'));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.locals.prefixAdmin = system_1.systemConfig.prefixAdmin;
+app.locals.moment = moment_1.default;
 (0, index_route_1.default)(app);
 (0, index_route_2.default)(app);
 app.get("*", (req, res) => {

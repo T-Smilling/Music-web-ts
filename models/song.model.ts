@@ -32,6 +32,25 @@ const songSchema = new mongoose.Schema(
       default: false,
     },
     deletedAt: Date,
+    createdBy:{
+      account_id: String,
+      createAt:{
+        type:Date,
+        default: Date.now
+      }
+    },
+    deletedBy:{
+      account_id: String,
+      deletedAt:Date
+    },
+    featured:String,
+    updatedBy:[
+      {
+        account_id: String,
+        accountFullName:String,
+        updatedAt:Date
+      },
+    ],
   },
   {
     timestamps: true,

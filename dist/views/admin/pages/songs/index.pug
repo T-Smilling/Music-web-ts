@@ -4,6 +4,7 @@ include ../../mixins/search.pug
 include ../../mixins/filterStatus.pug
 include ../../mixins/sort.pug
 include ../../mixins/selection.pug
+include ../../mixins/timeUpdate.pug
 
 block main
   h1(class="mb-4") #{pageTitle}
@@ -52,6 +53,8 @@ block main
               th Ca sĩ
               th Chủ đề
               th Trạng thái
+              th Người tạo
+              th Cập nhật gần nhất
               th Hành động
 
           tbody
@@ -91,6 +94,14 @@ block main
                       button-change-status
                       data-id=item.id
                     ) Dừng hoạt động
+                td
+                  if(item.accountFullName)
+                    p #{item.accountFullName}
+                    +set-time(item.createdBy.createAt)
+                td
+                  if(item.updatedBy.accountFullName)
+                    p #{item.updatedBy.accountFullName}
+                    +set-time(item.updatedBy.updatedAt)
                 td
                   a(
                     class="btn btn-secondary btn-sm"

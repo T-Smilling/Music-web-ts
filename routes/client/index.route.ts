@@ -7,10 +7,12 @@ import { RouteUser } from "./user.route";
 import * as userMiddleware from "../../middlewares/user.middleware";
 import { FavoriteRoute } from "./favorite-songs.route";
 import * as SettingMiddleware from "../../middlewares/setting.middleware";
+import { HomeRoute } from "./home.route";
 
 const ClientRoute = (app:Express) :void => {
   app.use(userMiddleware.infoUser);
   app.use(SettingMiddleware.SettingGeneral);
+  app.use("/",HomeRoute);
   app.use("/topics",TopicRoute);
   app.use("/songs",SongRoute);
   app.use("/search",SearchRoute);
