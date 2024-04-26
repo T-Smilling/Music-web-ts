@@ -12,7 +12,6 @@ import {systemConfig} from "./config/system";
 import ClientRoute from "./routes/client/index.route";
 import AdminRoute from "./routes/admin/index.route";
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 database.connect();
 
