@@ -1,4 +1,6 @@
-import express ,{Express,Request,Response} from "express";
+const startTime = new Date().getTime();
+
+import express ,{Express} from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
@@ -11,7 +13,6 @@ import * as database from "./config/database";
 import {systemConfig} from "./config/system";
 import ClientRoute from "./routes/client/index.route";
 import AdminRoute from "./routes/admin/index.route";
-
 
 database.connect();
 
@@ -37,6 +38,11 @@ app.locals.moment=moment;
 ClientRoute(app);
 AdminRoute(app);
 //End Route
+
+const endTime = new Date().getTime();
+const executionTime = endTime - startTime;
+
+console.log("Thời gian thực thi của hàm là: " + executionTime + " mili giây");
 
 app.get("*",(req,res) => {
   res.render("client/pages/errors/404",{

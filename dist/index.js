@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const startTime = new Date().getTime();
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -52,6 +53,9 @@ app.locals.prefixAdmin = system_1.systemConfig.prefixAdmin;
 app.locals.moment = moment_1.default;
 (0, index_route_1.default)(app);
 (0, index_route_2.default)(app);
+const endTime = new Date().getTime();
+const executionTime = endTime - startTime;
+console.log("Thời gian thực thi của hàm là: " + executionTime + " mili giây");
 app.get("*", (req, res) => {
     res.render("client/pages/errors/404", {
         pageTitle: "404 Not Fount",
